@@ -15,7 +15,8 @@ import time
 # Initialize Flask app
 app = Flask(__name__, template_folder='templates')
 
-CORS(app)  # Enable CORS for all routes
+CORS(app, resources={r"/*": {"origins": "https://agent3517.github.io/web_scraping/"}})
+
 
 # Global variable for storing results
 scraped_results = []
