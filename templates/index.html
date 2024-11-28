@@ -8,6 +8,7 @@
         .center {
             margin: auto;
             width: 60%;
+            text-align: center;
         }
         body {
             font-family: Arial, sans-serif;
@@ -36,11 +37,24 @@
         th {
             background-color: #f4f4f4;
         }
+        td a {
+            color: blue;
+            text-decoration: none;
+        }
+        td a:hover {
+            text-decoration: underline;
+        }
         #loading {
             text-align: center;
             font-weight: bold;
             margin-top: 20px;
             display: none;
+        }
+        #export-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -66,7 +80,9 @@
         <tbody></tbody>
     </table>
 
-    <button id="export-btn" style="display:none;">Export to CSV</button>
+    <div class="center">
+        <button id="export-btn" style="display:none;">Export to CSV</button>
+    </div>
 
     <script>
         document.getElementById('search-form').addEventListener('submit', async (e) => {
