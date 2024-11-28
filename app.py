@@ -15,8 +15,6 @@ import time
 # Initialize Flask app
 app = Flask(__name__, template_folder='templates')
 
-#enable corsk
-app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
 
 # Global variable for storing results
