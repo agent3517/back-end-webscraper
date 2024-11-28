@@ -18,24 +18,18 @@ scraped_results = []
 
 def initialize_driver():
     options = Options()
-    options.add_argument('--headless')  # Run headlessly in the background
+    options.add_argument('--headless')
+    options.add_argument('--disable-gpu')
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
-    options.add_argument('--disable-gpu')
-    
-    # Changing user agent to mimic real browsing
-    options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.5735.90 Safari/537.36")
-    
-    # Set capabilities within options
-    caps = options.to_capabilities()
-    caps["goog:loggingPrefs"] = {"performance": "ALL"}
-    caps["pageLoadStrategy"] = "normal"
-    
-    # Create service object for the ChromeDriver
-    service = ChromeService()
 
-    driver = webdriver.Chrome(service=service, options=options)
+    # Set the correct Chrome binary path
+    options.binary_location = '/app/.apt/usr/bin/google-chrome'
+
+    # Initialize WebDriver
+    driver = webdriver.Chrome(options=options)
     return driver
+
 
 # Function to scrape Google search results
 def google_scrape(keyword):
