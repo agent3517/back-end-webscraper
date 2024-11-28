@@ -8,10 +8,16 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+from flask_cors import CORS
 import time
+
 
 # Initialize Flask app
 app = Flask(__name__, template_folder='templates')
+
+#enable corsk
+app = Flask(__name__)
+CORS(app)  # Enable CORS for all routes
 
 # Global variable for storing results
 scraped_results = []
