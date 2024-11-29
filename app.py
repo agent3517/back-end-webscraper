@@ -9,7 +9,6 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 import time
-import tempfile
 import os
 
 
@@ -94,27 +93,29 @@ def search_route():
 # Route for exporting results to CSV
 @app.route('/export', methods=['GET'])
 def export():
+@app.route('/export', methods=['GET'])
+def export():
     global scraped_results
 
-    # Use a temporary file to store the CSV data
-    temp_dir = tempfile.gettempdir()
-    file_path = os.path.join(temp_dir, 'results.csv')
+    # Create a CSV file in memory
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(['Title', 'Link', 'Snippet'])  # Write headers
 
-    try:
-        # Write the scraped results to a CSV file
-        with open(file_path, 'w', newline='', encoding='utf-8') as file:
-            writer = csv.writer(file)
-            writer.writerow(['Title', 'Link', 'Snippet'])  # Write headers
-            for result in scraped_results:
-                writer.writerow([result['title'], result['link'], result['snippet']])
+    for result in scraped_results:
+        writer.writerow([result['title'], result['link'], result['snippet']])
 
-        print(f"CSV exported to {file_path}")  # Debugging log
-        return send_file(file_path, as_attachment=True)
+    # Move the cursor to the beginning of the file
+    output.seek(0)
 
-    except Exception as e:
-        print(f"Error exporting CSV: {e}")
-        return jsonify({"error": "Failed to export CSV"}), 500
-
+    # Return the file as an attachment
+    return send_file(
+        io.BytesIO(output.getvalue().encode('utf-8')),
+        mimetype='text/csv',
+        as_attachment=True,
+        download_name='results.csv'
+    )
+    
 @app.route('/')
 def index():
     print("Serving index.html")  # Debug log
