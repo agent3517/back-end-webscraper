@@ -9,6 +9,9 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 import time
+import tempfile
+import os
+
 
 # Initialize Flask app
 app = Flask(__name__, template_folder='templates')
@@ -92,13 +95,25 @@ def search_route():
 @app.route('/export', methods=['GET'])
 def export():
     global scraped_results
-    file_path = 'results.csv'
-    with open(file_path, 'w', newline='', encoding='utf-8') as file:
-        writer = csv.writer(file)
-        writer.writerow(['Title', 'Link', 'Snippet'])
-        for result in scraped_results:
-            writer.writerow([result['title'], result['link'], result['snippet']])
-    return send_file(file_path, as_attachment=True)
+
+    # Use a temporary file to store the CSV data
+    temp_dir = tempfile.gettempdir()
+    file_path = os.path.join(temp_dir, 'results.csv')
+
+    try:
+        # Write the scraped results to a CSV file
+        with open(file_path, 'w', newline='', encoding='utf-8') as file:
+            writer = csv.writer(file)
+            writer.writerow(['Title', 'Link', 'Snippet'])  # Write headers
+            for result in scraped_results:
+                writer.writerow([result['title'], result['link'], result['snippet']])
+
+        print(f"CSV exported to {file_path}")  # Debugging log
+        return send_file(file_path, as_attachment=True)
+
+    except Exception as e:
+        print(f"Error exporting CSV: {e}")
+        return jsonify({"error": "Failed to export CSV"}), 500
 
 @app.route('/')
 def index():
