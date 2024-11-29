@@ -8,31 +8,36 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
-from flask_cors import CORS
 import time
-
+import io 
+import os
+import sys
 
 # Initialize Flask app
 app = Flask(__name__, template_folder='templates')
-
-CORS(app, resources={r"/*": {"origins": "https://agent3517.github.io/web_scraping/"}})
-
 
 # Global variable for storing results
 scraped_results = []
 
 def initialize_driver():
     options = Options()
-    options.add_argument('--headless')
-    options.add_argument('--disable-gpu')
+    options.add_argument('--headless')  # Run headlessly in the background
     options.add_argument('--no-sandbox')
     options.add_argument('--disable-dev-shm-usage')
+    options.add_argument('--disable-gpu')
+    
+    # Changing user agent to mimic real browsing
+    options.add_argument("user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.5735.90 Safari/537.36")
+    
+    # Set capabilities within options
+    caps = options.to_capabilities()
+    caps["goog:loggingPrefs"] = {"performance": "ALL"}
+    caps["pageLoadStrategy"] = "normal"
+    
+    # Create service object for the ChromeDriver
+    service = ChromeService()
 
-    # Set the correct Chrome binary path
-    options.binary_location = '/app/.apt/usr/bin/google-chrome'
-
-    # Initialize WebDriver
-    driver = webdriver.Chrome(options=options)
+    driver = webdriver.Chrome(service=service, options=options)
     return driver
 
 
@@ -64,8 +69,8 @@ def google_scrape(keyword):
         for g in soup.find_all('div', class_='tF2Cxc'):
             title = g.find('h3').text if g.find('h3') else 'No title'
             link = g.find('a')['href'] if g.find('a') else 'No link'
-            #snippet = g.find('span', class_='aCOpRe').text if g.find('span', class_='aCOpRe') else 'No snippet'
-            scraped_results.append({'title': title, 'link': link})
+            snippet = g.find('span', class_='aCOpRe').text if g.find('span', class_='aCOpRe') else 'No snippet'
+            scraped_results.append({'title': title, 'link': link, 'snippet': snippet})
 
     except Exception as e:
         print(f"An error occurred while scraping: {e}")
@@ -90,16 +95,29 @@ def search_route():
 @app.route('/export', methods=['GET'])
 def export():
     global scraped_results
-    file_path = 'results.csv'
-    with open(file_path, 'w', newline='', encoding='utf-8') as file:
-        writer = csv.writer(file)
-        writer.writerow(['Title', 'Link', 'Snippet'])
-        for result in scraped_results:
-            writer.writerow([result['title'], result['link'], result['snippet']])
-    return send_file(file_path, as_attachment=True)
 
+    # Create a CSV file in memory
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(['Title', 'Link', 'Snippet'])  # Write headers
+
+    for result in scraped_results:
+        writer.writerow([result['title'], result['link'], result['snippet']])
+
+    # Move the cursor to the beginning of the file
+    output.seek(0)
+
+    # Return the file as an attachment
+    return send_file(
+        io.BytesIO(output.getvalue().encode('utf-8')),
+        mimetype='text/csv',
+        as_attachment=True,
+        download_name='results.csv'
+    )
+    
 @app.route('/')
 def index():
+    print("Serving index.html")  # Debug log
     return render_template('index.html')  # Your front-end HTML file
 
 if __name__ == '__main__':
