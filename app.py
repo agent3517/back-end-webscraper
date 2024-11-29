@@ -91,8 +91,7 @@ def search_route():
     return jsonify({"results": scraped_results})
 
 # Route for exporting results to CSV
-@app.route('/export', methods=['GET'])
-def export():
+    
 @app.route('/export', methods=['GET'])
 def export():
     global scraped_results
