@@ -69,7 +69,7 @@ def google_scrape(keyword):
         for g in soup.find_all('div', class_='tF2Cxc'):
             title = g.find('h3').text if g.find('h3') else 'No title'
             link = g.find('a')['href'] if g.find('a') else 'No link'
-            snippet = g.find('span', class_='aCOpRe').text if g.find('span', class_='aCOpRe') else 'No snippet'
+            snippet = g.find('span').get_text() if g.find('span') else 'No snippet'
             scraped_results.append({'title': title, 'link': link, 'snippet': snippet})
 
     except Exception as e:
