@@ -140,6 +140,29 @@
                 loadingIndicator.style.display = 'none';
             }
         });
+
+        // Event listener for "Export to CSV" button
+        document.getElementById('export-btn').addEventListener('click', async () => {
+            try {
+                const response = await fetch('/export');
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = url;
+                    a.download = 'results.csv'; // File name for the downloaded CSV
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                } else {
+                    alert('Failed to export data.');
+                }
+            } catch (error) {
+                console.error('Error exporting data:', error);
+                alert('An error occurred while exporting data.');
+            }
+        });
     </script>
 </body>
 </html>
