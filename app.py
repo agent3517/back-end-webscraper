@@ -10,7 +10,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 import time
 import os
-
+import sys
 
 # Initialize Flask app
 app = Flask(__name__, template_folder='templates')
@@ -91,7 +91,7 @@ def search_route():
     return jsonify({"results": scraped_results})
 
 # Route for exporting results to CSV
-    
+# Route for exporting results to CSV
 @app.route('/export', methods=['GET'])
 def export():
     global scraped_results
@@ -114,6 +114,7 @@ def export():
         as_attachment=True,
         download_name='results.csv'
     )
+    
     
 @app.route('/')
 def index():
