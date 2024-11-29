@@ -9,6 +9,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 import time
+import io 
 import os
 import sys
 
@@ -91,7 +92,6 @@ def search_route():
     return jsonify({"results": scraped_results})
 
 # Route for exporting results to CSV
-# Route for exporting results to CSV
 @app.route('/export', methods=['GET'])
 def export():
     global scraped_results
@@ -114,7 +114,6 @@ def export():
         as_attachment=True,
         download_name='results.csv'
     )
-    
     
 @app.route('/')
 def index():
